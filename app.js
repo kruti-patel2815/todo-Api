@@ -8,19 +8,17 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
 
-// Routes
+
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const todoRouter = require('./routes/todoRoutes');
 
-// DB
+
 const connectDB = require('./config/db');
 
 const app = express();
 
-/* ======================
-   DATABASE CONNECTION
-====================== */
+
 connectDB()
   .then(() => {
     console.log('✅ Database connected');
@@ -29,9 +27,6 @@ connectDB()
     console.error('❌ MongoDB connection error:', err);
   });
 
-/* ======================
-   MIDDLEWARES
-====================== */
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -45,16 +40,12 @@ app.use(
   })
 );
 
-/* ======================
-   ROUTES
-====================== */
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api/todos', todoRouter);
 
-/* ======================
-   HEALTH CHECK
-====================== */
+
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
@@ -62,9 +53,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-/* ======================
-   404 HANDLER
-====================== */
 app.use((req, res) => {
   res.status(404).json({
     error: 'Not Found',
@@ -72,10 +60,7 @@ app.use((req, res) => {
   });
 });
 
-/* ======================
-   GLOBAL ERROR HANDLER
-   (Vercel SAFE – JSON only)
-====================== */
+
 app.use((err, req, res, next) => {
   console.error('🔥 Error:', err);
 
