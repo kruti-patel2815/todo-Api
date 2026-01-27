@@ -2,85 +2,88 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var cors = require('cors');
+const createError = require('http-errors');
+const express = require('express');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const cors = require('cors');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var todoRouter = require('./routes/todoRoutes');
+// Routes
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const todoRouter = require('./routes/todoRoutes');
 
-var connectDB = require('./config/db');
+// DB
+const connectDB = require('./config/db');
 
-var app = express();
+const app = express();
 
-connectDB().catch(err => {
-  console.error('MongoDB connection error:', err);
-});
+/* ======================
+   DATABASE CONNECTION
+====================== */
+connectDB()
+  .then(() => {
+    console.log('✅ Database connected');
+  })
+  .catch((err) => {
+    console.error('❌ MongoDB connection error:', err);
+  });
 
-
+/* ======================
+   MIDDLEWARES
+====================== */
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
 
+app.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
+);
 
+/* ======================
+   ROUTES
+====================== */
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/api/todos', todoRouter);
 
-
+/* ======================
+   HEALTH CHECK
+====================== */
 app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
-});
-
-
-app.use(function(req, res, next) {
-  res.status(404).json({
-    error: 'Not Found',
-    message: 'The requested resource was not found'
+  res.status(200).json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
   });
 });
 
-
-app.use(function(err, req, res, next) {
-  console.error('Error:', err);
-  
-  const isDevelopment = process.env.NODE_ENV === 'development';
-  
-  const errorResponse = {
-    error: err.message || 'Internal Server Error',
-    status: err.status || 500
-  };
-  
-  if (isDevelopment) {
-    errorResponse.stack = err.stack;
-  }
-  
-  res.status(err.status || 500);
-  
-  if (req.accepts('json')) {
-    res.json(errorResponse);
-  } else {
-    res.render('error', { 
-      message: err.message,
-      error: isDevelopment ? err : {}
-    });
-  }
+/* ======================
+   404 HANDLER
+====================== */
+app.use((req, res) => {
+  res.status(404).json({
+    error: 'Not Found',
+    message: 'The requested resource was not found',
+  });
 });
 
+/* ======================
+   GLOBAL ERROR HANDLER
+   (Vercel SAFE – JSON only)
+====================== */
+app.use((err, req, res, next) => {
+  console.error('🔥 Error:', err);
 
-const PORT = process.env.PORT || 3000;
-
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal Server Error',
+    status: err.status || 500,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+  });
+});
 
 module.exports = app;
-
-
