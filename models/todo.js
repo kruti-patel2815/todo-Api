@@ -6,7 +6,8 @@ const todoSchema = new mongoose.Schema({
     required: true
   },
   description: {
-    type: String
+    type: String,
+    default: '' 
   },
   completed: {
     type: Boolean,
@@ -26,4 +27,5 @@ const todoSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model('Todo', todoSchema);
+
+module.exports = mongoose.model('Todo', todoSchema, 'todos');  
