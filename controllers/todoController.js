@@ -19,3 +19,11 @@ exports.deleteTodo = async (req, res) => {
   await Todo.findByIdAndDelete(req.params.id);
   res.json({ message: 'Todo deleted' });
 };
+exports.renderHome = async (req, res) => {
+  try {
+    const todos = await Todo.find(); 
+    res.render('home', { todos });   
+  } catch (err) {
+    res.send(err.message);
+  }
+};

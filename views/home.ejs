@@ -21,14 +21,41 @@
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5><%= todo.title %></h5>
-                            <p><%= todo.description %></p>
-                            <p><small>Priority: <%= todo.priority %></small></p>
+
+                            
+                            <h5 class="card-title"><%= todo.title %></h5>
+
+                           
+                            <% if (todo.description) { %>
+                                <p class="card-text"><%= todo.description %></p>
+                            <% } %>
+
+                            
+                            <p class="mb-1">
+                                <small>
+                                    Priority: <strong><%= todo.priority %></strong><br>
+                                    Status: <strong><%= todo.status %></strong><br>
+                                    Category: <strong><%= todo.category %></strong>
+                                </small>
+                            </p>
+
+                            
+                            <% if (todo.dueDate) { %>
+                                <p class="mb-2">
+                                    <small>Due Date: <%= todo.dueDate %></small>
+                                </p>
+                            <% } %>
+
+                            
                             <div>
                                 <a href="/todos/edit/<%= todo._id %>" class="btn btn-warning btn-sm">Edit</a>
-                                <a href="/todos/delete/<%= todo._id %>" class="btn btn-danger btn-sm" 
-                                   onclick="return confirm('Delete?')">Delete</a>
+                                <a href="/todos/delete/<%= todo._id %>" 
+                                   class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Delete?')">
+                                   Delete
+                                </a>
                             </div>
+
                         </div>
                     </div>
                 </div>

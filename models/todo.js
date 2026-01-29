@@ -1,31 +1,37 @@
 const mongoose = require('mongoose');
 
 const todoSchema = new mongoose.Schema({
-  title: {
+  title: { type: String, required: true },
+
+  description: { type: String, default: '' },
+
+  completed: { type: Boolean, default: false },
+
+  status: {
     type: String,
-    required: true
+    enum: ['pending', 'completed'],
+    default: 'pending'
   },
-  description: {
+
+  category: {
     type: String,
-    default: '' 
+    default: 'general'
   },
-  completed: {
-    type: Boolean,
-    default: false
-  },
+
   priority: {
     type: String,
     enum: ['low', 'medium', 'high'],
     default: 'medium'
   },
-  dueDate: {
-    type: Date
-  },
+
+  dueDate: Date,
+
   createdAt: {
     type: Date,
     default: Date.now
   }
 });
+
 
 
 module.exports = mongoose.model('Todo', todoSchema, 'todos');  

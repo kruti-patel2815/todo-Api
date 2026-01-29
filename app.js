@@ -67,25 +67,11 @@ app.get('/todos/new', (req, res) => {
 
 
 app.post('/todos/new', async (req, res) => {
-  try {
-    console.log('Form data:', req.body);
-    
-    await Todo.create({
-      title: req.body.title,
-      description: req.body.description || '',
-      priority: req.body.priority || 'medium'
-    });
-    
-    console.log(' Todo saved');
-    res.redirect('/home');
-  } catch (err) {
-    console.error('Error:', err);
-    res.render('addTodo', { 
-      title: 'Add Todo',
-      error: err.message 
-    });
-  }
+  const todo = new Todo(req.body); 
+  await todo.save();
+  res.redirect('/home');
 });
+
 
 
 app.get('/todos/edit/:id', async (req, res) => {
@@ -102,17 +88,18 @@ app.get('/todos/edit/:id', async (req, res) => {
 
 
 app.post('/todos/edit/:id', async (req, res) => {
-  try {
-    await Todo.findByIdAndUpdate(req.params.id, {
-      title: req.body.title,
-      description: req.body.description || '',
-      priority: req.body.priority || 'medium'
-    });
-    res.redirect('/home');
-  } catch (err) {
-    res.status(500).send('Error');
-  }
+  await Todo.findByIdAndUpdate(req.params.id, {
+    title: req.body.title,
+    description: req.body.description,
+    priority: req.body.priority,
+    status: req.body.status,
+    category: req.body.category,
+    dueDate: req.body.dueDate
+  });
+
+  res.redirect('/home');
 });
+
 
 
 app.get('/todos/delete/:id', async (req, res) => {
